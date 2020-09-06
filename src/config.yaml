@@ -1,0 +1,38 @@
+#Range of values to hash to.
+#TimeDifference bin range can be found inside preprocess.py:getTimeClass function
+variablesHash:
+  #Hash Range for HTTP User Agent.
+  agentHashRange: 50
+  #Hash Range for HTTP GET Queries
+  queryHashRange: 4
+  #Threshold for hashing requests. If lesser than percentage we hash it to inputHashRange
+  #If larger than percentage we preserve the original request
+  inputHashThreshold: 0.01
+  #Hash Range for Input (Input is the 4 temporal features)
+  inputHashRange: 100
+#Sequence Length
+SEQUENCELENGTH: 20
+#Keras Model Parameters
+MODELPARAMS:
+  #Emedding Layer Output Dimension
+  INPUT_EMBED_DIM: 16
+  #LSTM Output Dimension
+  LSTM_DIM: 32
+  #Adam Learning Rate
+  LEARNING_RATE: 0.005
+#Keras Training Parameters
+TRAININGPARAMS:
+  #Number of Epochs to train for
+  EPOCHS: 15
+  #Batch size
+  BATCH_SIZE: 256
+  #Percentage of data to be used for training. (1 - Percentage) is for validation.
+  PERCENTAGETRAIN: 0.75
+  #Number of workers to use during training
+  WORKERS: 24
+  #Allow multiprocessing during training (Not sure what this does) True/False
+  MULTIPROCESSING: True
+
+# The parameters below are not used in the current version
+T: 0.1
+W: 0.1

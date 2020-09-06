@@ -1,0 +1,37 @@
+2020-05-24 22:56:00 - __main__ - WARNING - Loading IVI_N1.csv
+2020-05-24 22:56:09 - __main__ - WARNING - Period: 2020-03-27 00:00:00.510000 to 2020-03-27 23:59:59.769000, number of requests: 1022865, number of users: 3499
+2020-05-24 22:56:09 - __main__ - WARNING - Training model...
+2020-05-24 22:56:09 - src.pipe - INFO - Splitting training data into df_train and df_val...
+2020-05-24 22:56:09 - src.pipeline_utils - INFO - Train test split:
+    Original: 3499 users (H: 190, M: 535, L: 2774). df.shape = (1022865, 6)
+    Train: 2623 users (H: 142, M: 401, L: 2080). df_train.shape = (768466, 6)
+    Test: 876 users (H: 48, M: 134, L: 694). df_test.shape = (254399, 6)
+2020-05-24 22:56:09 - src.pipe - INFO - Transforming df_train...
+2020-05-24 22:56:10 - src.feature_eng - INFO - Feature engineering: time_diff (0.4 s)
+2020-05-24 22:56:14 - src.pipe - INFO - Generate sequences of length 10:
+    Before: 2623 users, 768466 rows,
+    After filtering (drop users with insufficient requests): 2460 users, 767847 rows
+2020-05-24 22:56:18 - src.pipe - INFO - Number of requests that can be scored: 743247
+2020-05-24 22:56:20 - src.pipe - INFO - Summary of data_transform (feature eng, column transform and sequence generation):
+        Input:
+            df: (768466, 7),
+        Outputs:
+            df_filtered: (743247, 9),
+            X: [(743247, 10, 4), (743247, 10, 1), (743247, 10, 1), (743247, 10, 1), (743247, 10, 1)],
+            y: [(743247, 4), (743247, 1), (743247, 1), (743247, 1)]
+2020-05-24 22:56:20 - src.pipe - INFO - Transforming df_val...
+2020-05-24 22:56:21 - src.feature_eng - INFO - Feature engineering: time_diff (0.1 s)
+2020-05-24 22:56:22 - src.pipe - INFO - Generate sequences of length 10:
+    Before: 876 users, 254399 rows,
+    After filtering (drop users with insufficient requests): 817 users, 254164 rows
+2020-05-24 22:56:23 - src.pipe - INFO - Number of requests that can be scored: 245994
+2020-05-24 22:56:23 - src.pipe - INFO - Summary of data_transform (feature eng, column transform and sequence generation):
+        Input:
+            df: (254399, 7),
+        Outputs:
+            df_filtered: (245994, 8),
+            X: [(245994, 10, 4), (245994, 10, 1), (245994, 10, 1), (245994, 10, 1), (245994, 10, 1)],
+            y: [(245994, 4), (245994, 1), (245994, 1), (245994, 1)]
+2020-05-24 22:57:32 - src.pipe - INFO - Generating scores for df_train...
+2020-05-24 22:57:35 - src.pipe - INFO - Generating scores for df_val...
+2020-05-24 22:57:36 - __main__ - WARNING - Training complete. Time taken: 96.2 s

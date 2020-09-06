@@ -1,0 +1,27 @@
+2020-05-24 23:02:41 - __main__ - WARNING - Found 1 csv files, processing: 2020-03-30-223553_to_2020-04-01-121753.csv
+2020-05-24 23:03:40 - __main__ - WARNING - Number of requests in batch: 6375324
+2020-05-24 23:03:45 - src.feature_eng - INFO - Feature engineering: time_diff (4.4 s)
+2020-05-24 23:04:03 - src.pipe - INFO - Generate sequences of length 10:
+    Before: 2950 users, 6375324 rows,
+    After filtering (drop users with insufficient requests): 2950 users, 6375324 rows
+2020-05-24 23:04:24 - src.pipe - INFO - Number of requests that can be scored: 6345824
+2020-05-24 23:04:42 - src.pipe - INFO - Summary of data_transform (feature eng, column transform and sequence generation):
+        Input:
+            df: (6375324, 7),
+        Outputs:
+            df_filtered: (6345824, 8),
+            X: [(6345824, 10, 4), (6345824, 10, 1), (6345824, 10, 1), (6345824, 10, 1), (6345824, 10, 1)],
+            y: [(6345824, 4), (6345824, 1), (6345824, 1), (6345824, 1)]
+2020-05-24 23:07:33 - __main__ - WARNING - Number of requests scored in batch: 6345824
+2020-05-24 23:07:35 - __main__ - WARNING - 
+            ----------------------------------------
+            Request scores in past hour: 6345824 requests
+            User scores generated for: 2950 users
+            ----------------------------------------
+2020-05-24 23:08:34 - __main__ - ERROR - Traceback (most recent call last):
+  File "/usr/toffs_infer/src/inference.py", line 146, in inference
+    shutil.move(data_dir+filename, processed_dir)
+  File "/opt/conda/lib/python3.6/shutil.py", line 542, in move
+    raise Error("Destination path '%s' already exists" % real_dst)
+shutil.Error: Destination path './data/inference/processed/2020-03-30-223553_to_2020-04-01-121753.csv' already exists
+

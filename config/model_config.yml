@@ -1,0 +1,159 @@
+# Lines starting with # is a comment. There are no block comments symbols.
+# This configuration file is read by parse_yaml_file function as a Python nested dictionary (with some lists inside). Thus be careful with the use of spacing!
+# There are 5 sections in this configuration file, ie keys in dictionary:
+    # 1. data  2. model  3.  evaluation  4. plotting  5. others
+# Rows with a ":" are keys in a dictionary. 
+# For instance "transformer: LabelTransformer" transformer is key, LabelTransformer is value
+#  key:
+#    subkey: 
+#      sub_subkey: value
+# Rows with a "-" are part of a Python List. 
+# For instance 'timestamp' and 'remote_addr' are entries in a list, and the key to access the list is 'base'
+# for help in changing configuration, refer to the comments at the end of this file.
+data:
+  base:
+  - timestamp
+  - remote_addr
+  model_features:
+    country_code:
+      transformer: LabelTransformer
+    http_user_agent:
+      transformer: LabelTransformer
+    request_uri:
+      transformer: uriTransformer
+    status:
+      transformer: StatusEncoder
+  feature_eng:
+    time_diff:
+      function: calculate_time_diff
+      transformer: ExponentialDecay
+model:
+  type: sequential
+  definition: LSTM_v2
+  model_parameters:
+    model_inputs:
+    - status
+    - country_code
+    - request_uri
+    - http_user_agent
+    - time_diff
+    model_outputs:
+    - status
+    - country_code
+    - request_uri
+    - time_diff
+    sequence_length: 10
+    embed_scaling: 0.5
+    hidden_nodes: 32
+  training_parameters:
+    epochs: 10
+    lr: 0.001
+    batch_size: 5000
+    losses: 'auto'
+      
+##### FOR PS TEAM DEPLOYMENT USE
+deployment_paths:
+  train_data: './data/train/'
+  inference_data: './data/inference/'
+  artefacts: './artefacts/'
+  logs: './logs/'
+
+##### FOR PI TEAM EVALUATION USE ONLY
+evaluation:
+  output_dir: ./artefacts/evaluation/expt1/
+  DATA_DIR: ./data/evaluation/
+  filename: June_888.abcb11.com_stage3.parquet
+  training_period: all
+#   training_period:
+#   - '2019-08-09 00:00:00'
+#   - '2019-08-12 00:00:00'
+  inference_period: attack
+#   inference_period:
+#   - '2019-08-13 22:00:00'
+#   - '2019-08-14 04:00:00'
+  attack_timestamps: './data/metadata/attack_timestamps.json' # must be provided if training period or inference period refer to 'attack' or if pgt is used
+  labels:
+#       type: pgt
+      type: agt
+      file: './data/metadata/888.abcb11.com_actual_labels.csv'
+plotting:
+  max_observe_period: 25
+  plot_observe_period: 9
+others:
+  random_state: 42
+  debug: True
+
+#-----------------------------------------------------------------------------------------------------
+# About Data Section  : 
+# base                : A list of strings. compulsory - timestamp and remote_addr. Additional features can be added here (as long as they are not part of the model_features and feature_eng. These columns will appear in the intermediate dataframes if debug is enabled. 
+
+# model_features      :  This is a nested dict. Each feature to be used in model is a key, and it requires the following subkeys:
+          #transformer: (compulsory) transformer. This is a string corresponding to the choice of functions in preprocessing.py
+   #transformer_params: (optional) Is a dictionary of parameters. If not listed, the code assumes no additional parameters passed to the transformer function.
+
+# feature_eng         : This is also a nested dict. Each feature needs to be generated AND transformed, ie time_diff is not in the default data columns. Has the following keys:
+             #function: (compulsory) Generates the column from other columns. refer to sample functions calculate_time_diff in src.fearure_eng.py
+      #function_params: (optional) Is a dictionary of parameters. If not listed, the code assumes no additional parameters passed to the function.     
+          #transformer: (compulsory) transformer. This is a string corresponding to the choice of functions in preprocessing.py
+   #transformer_params: (optional) Is a dictionary of parameters. If not listed, the code assumes no additional parameters passed to the transformer function.
+
+#-----------------------------------------------------------------------------------------------------
+# About Model Section : Affects keras LSTM model definition
+# type                : only 'sequential' is supported. Do not change.
+# definition          : only LSTM_v2 (recommended)
+# model_parameters    : A dictionary of parameters relating to Keras model.
+   # model inputs     : The input features to the keras LSTM model definition
+   #                    It can either be a string "all" -> all features stated in "model features" and "feature eng" will be used as inputs
+   #                    Or a list: Entries in this list must be listed in "model features" and "feature eng" sections.
+   # model outputs    : The output features to the keras LSTM model
+   #                    It can either be a string "all" -> all features stated in "model features" and "feature eng" will be used as outputs                   
+   #                    Or a list: Entries in this list must be listed in "model features" and "feature eng" sections.
+   # sequence_length  : length of the LSTM sequence. Recommended: 10
+   # embed_scaling    : For the categorical features in model, embedding layer is used to compress the layers. the output size of the embedding layer is (original dimension of input feature)**embed_scaling_factor. Must be a float value from 0 < embed_scaling<= 1.
+   # hidden nodes     : The input features are concatenated after the embed features and connected to a dense layer of size *hidden_nodes*. Must be a integer 0 < hidden_nodes < positive integer. Recommended: 32
+# training_parameters : A dictionary relating to the training process of model
+   #epochs            : # of epochs to train. An integer, recommended: 10
+   # lr               : learning rate of how fast the model changes in response to training errors. Float value between 0 < lr <= positive float, but recommended to be 0.001 to avoid gradient explosion.
+   # batch size       : Number of samples the model considers during each update of the weights. Integer >0 , Recommended: 5000
+   # losses:          : Can be either a string "auto" or dictionary. As this is a multiple-input/output model, there are individual losses associated with the features.
+   #                    String "auto": Depending on the type of transformer used and input feature, the code will adopt the recommended loss function for that output feature. This only supports the known transformers in the repo. For custom transformers, please specify dict.
+   #                    Dictionary: define key-value of "feature":"loss_type". loss type can be found at https://keras.io/losses/. There must be as many keys as the number of output features specified.
+
+
+#-----------------------------------------------------------------------------------------------------
+# About Evaluation Section:
+# Output dir       : the location of the outputs, logs from the pipeline and model
+# DATA_DIR         : the location of the data files (parquet format)
+# filename         : Name of the parquet file
+# training_period  : It can either be "all": the code will assume the entire df is used for training (subtract the inference period)
+#                    OR, define the period as a 2-element list [start_time, end_time]. 
+#                    Sample timestamp: "2019-08-09 00:00:00"
+# inference_period : It can either be "attack": if the filename has an entry in the metadata/attack_timestamp.json
+#                    OR, define the period similarly as training_period, as a 2-element list
+# attack_timestamps: string, example './data/metadata/attack_timestamps.json' This is a file that stores the attack_timestamp.json                              metadata. It is only not used in the following circumstance: 
+#                    When AGT is used and training&inference timings are specifically given.
+# Labels           : Specify the label to evaluate against. 
+#                    agt: Actual Ground Truth, referring to the manually labeled datasets.
+#                    If pgt is specified, the code will assume that *new* users that *only* appears during the attack period of the                              filename is attacker. All other users are considered normal. 
+#                    It is a dictionary consisting of the following. 
+#        type      : either "agt" or "pgt"
+#        file      : If AGT is specified in labels, provide the location of the agt file. Else, this parameter is ignored for PGT. For     #                    instance: './data/metadata/888.abcb11.com_actual_labels.csv' 
+
+#-----------------------------------------------------------------------------------------------------
+# About Plotting: This section is for plotting the estimated web traffic graph
+# This section is supporting the default aggregation function "prod". 
+# ie, n=3 means that only users with more/equal to (LSTM seq length)+3 requests will have a predicted class. 
+# ie if LSTM seq length=10,
+# score of user at n=3 is (11th request score x 12th request score x 13th request score) ** (1/3).
+# score of user at n=5 is (11th request score x 12th request score x .. x 15th request score) ** (1/5).
+# if user score is <=0.5, he is normal else he is attacker. (Compared against agt or pgt)
+
+# max_observe_period     :  Observation period: The code iterates from n=1 to max_observe_period and predicts the user's class based on the nth request. sklearn.classification_report is then ran for each n. Because users have different numbers of request, expect that the class support will decrease for increasing n. If n=25, there will be 25 rows of scores in user metrics.csv
+# plot_observe_period    : The user class is fixed at n requests. Users with less than (n + LSTM sequence length) requests will not have a prediction (as part of traffic let thru). Users with more than (n + LSTM sequence length) will have their class fixed at where requests = (n + LSTM sequence length).  The resultant traffic graph is plot as web traffic.html. 
+# Assumption is that there is NO reclassification of users after n requests. 
+
+
+#-----------------------------------------------------------------------------------------------------
+# About Others: This section is for miscellaneous outputs
+# random_state          : Initialises the random seeds in the code according to this value, ie numpy random values, keras dense array inits
+# debug                 : If True, the output fil
