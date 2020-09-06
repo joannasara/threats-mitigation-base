@@ -21,7 +21,7 @@ Deeper discussions of the methodology, findings can be found in other sections o
 Scripts and modules belonging to this repository has been tested on the following VM configuration:
 + Azure NC6v2 with P100 GPU, Ubuntu 18.04.3 LTS (comes with 112GiB RAM)
 
-It assumes the following dependensices are installed within the VM:
+It assumes the following dependencies are installed within the VM:
 + Nvidia GPU drivers
 + Docker
 + Nvidia-docker
@@ -32,11 +32,11 @@ Refer to the [FAQ section](#faq) on installing these dependencies.
 Git clone the [repository](https://bitbucket.ai3.aisingapore.org:9443/projects/TOFFTM/repos/threats-mitigation-base/browse) to the Linux machine that the experimentation would be conducted on.
 ```bash
 git clone <repo>
-cd threats-mitigation-base/scripts
+cd scripts
 bash toffs_build_train.sh
 bash toffs_build_infer.sh
 ```  
-The aforereferenced bash scripts will build the necessary Docker containers, `toffs_train:1.0` and `toffs_infer:1.0`. Necessary libraries will be read in from `config/requirements.txt` during docker build.
+The bash scripts will build the necessary Docker containers, `toffs_train:1.0` and `toffs_infer:1.0`. Necessary libraries will be read in from `config/requirements.txt` during docker build.
 
 __`To train model:`__  
 Requirements:  
@@ -90,7 +90,7 @@ bash scripts/toffs_run_infer.sh [folder_name] [training_file_name] [attack_file_
 ```  
 Note that the `training_file_name` is only needed  to preprocess the attack file and not for another round of training.
 
-The bash script will call Docker to run the `toffs_infer` container and do a folder bind of the repository in the VM to the relevant location in the Docker container. If it doesn't yet exist, a folder named `result` will be created to save the output files. The output scores would be saved in a `.csv` file named `PScore_[attack_file_name]`.
+The bash script will call Docker to run the `toffs_infer` container and do a folder bind of the repository in the VM to the relevant location in the Docker container. If it does not yet exist, a folder named `result` will be created to save the output files. The output scores would be saved in a `.csv` file named `PScore_[attack_file_name]`.
 <!-- The code will continuously loop thru any files found in the `/data/inference` folder, moving the `.csv` files that has been processed to `/data/inference/processed`. This is a single thread process loop. -->
 
 <!-- A screenshot of how the inference folder files looks like during internal testing is as such:  
