@@ -2,7 +2,7 @@
 # Threats-Mitigation Using Semi-Supervised LSTM model
 This readme has 2 target audience: <span style="color:LightGreen"> Sponsor Team </span> (a) and <span style="color:magenta">PI Team</span> (b). Where there are specific instructions, refer to the relevant section. If there are some broken image links, please refer to the `/assets/images` folder to view the images.
 
-# Table of Contents 
+# Table of Contents
 
 1a. [Quick Start <span style="color:LightGreen">Sponsor Team</span>](#quick-start-sponsor)  
 1b. [Quick Start <span style="color:magenta">PI Team</span>](#quick-start-pi)  
@@ -18,7 +18,7 @@ This readme has 2 target audience: <span style="color:LightGreen"> Sponsor Team 
 This section aims to quickly enable the user to train/run the model. However, additional steps will be required to transform the data from client operational network to the desired form required by this prototype.
 Deeper discussions of the methodology, findings can be found in other sections of this README document.   
 
-Scripts and modules belonging to this repository has been tested on the following VM configuration: 
+Scripts and modules belonging to this repository has been tested on the following VM configuration:
 + Azure NC6v2 with P100 GPU, Ubuntu 18.04.3 LTS (comes with 112GiB RAM)
 
 It assumes the following dependensices are installed within the VM:
@@ -33,7 +33,7 @@ Git clone the [repository](https://bitbucket.ai3.aisingapore.org:9443/projects/T
 ```bash
 git clone <repo>
 cd threats-mitigation-base/scripts
-bash toffs_build_train.sh 
+bash toffs_build_train.sh
 bash toffs_build_infer.sh
 ```  
 The aforereferenced bash scripts will build the necessary Docker containers, `toffs_train:1.0` and `toffs_infer:1.0`. Necessary libraries will be read in from `config/requirements.txt` during docker build.
@@ -63,7 +63,7 @@ __`To run inference model:`__
 Requirements:  
 The algorithm __should not__ be run during periods of normal operations because it will always rank users by suspicion level, and thus false positives will always be generated. During DDOS period, send `.csv` files of the logs (suggested: 5 minute intervals) to the `data/inference` folder of the repo in the host machine. The model assumes the timestamps are in order, i.e. entries that should be in the earlier log files are included in the later file. Currently, assumption is made for the absence of duplicates in the log files. The log files must be named in the following format to enable the model to easily infer the oldest file to read in order. Reading the files out of order could result in wrong intepretation of results:
 
-`yyyy-mm-dd-hhmmss_to_yyyy-mm-dd-hhmmss.csv` 
+`yyyy-mm-dd-hhmmss_to_yyyy-mm-dd-hhmmss.csv`
 (where the timestamp refers to the oldest timestamp in the file) For instance, `2019-08-13-220000_to_2019-08-13-220500.csv`
 
 Columns that are necessary:  
@@ -78,14 +78,14 @@ Note: Only the trained subdomain should be in the logs as the model does not fil
 
 Then, run the following from the root of the threats-mitigation-base folder:
 ```bash
-bash scripts/toffs_run_infer.sh 
+bash scripts/toffs_run_infer.sh
 ```  
 The bash script will call Docker to run the `toffs_infer` container and do a folder bind of the repository in the VM to the relevant location in the Docker container.
 The code will continuously loop thru any files found in the `/data/inference` folder, moving the `.csv` files that has been processed to `/data/inference/processed`. This is a single thread process loop.
 
 A screenshot of how the inference folder files looks like during internal testing is as such:  
 
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/1-inference-folder.png" width="300" align="middle"/>
+<img src="old_assets/images/1-inference-folder.png" width="300" align="middle"/>
 
 User scores, based on the latest processed batch of data, can be found under `/artefacts/inference`.
 The scores reflect the latest assessment of each `remote_addr` and thus the scores is expected to change over time.  
@@ -94,7 +94,7 @@ __Sample User Score:__
 
 (Interpretation)
 *EDITED after last meeting on 17th Dec, a new column, user_score_percentile has been added.*  
-   
+
 | remote_addr | last_seen             | score | user_score_percentile |
 |-------------|-----------------------|-------|-----------------------|
 | 56.2.156.2  | 2019-08-12 12:01:05   |  0.3  |   0.3                 |
@@ -105,7 +105,7 @@ There should not be any duplicate `remote_addr` in each `.csv`.
 User scores are float values between 0 and 1, where 0 is closer to __normal__ and 1 is __abnormal__. We recommend using default of score <= 0.5 to decide if the user is normal or abnormal. Users that are not seen in the last 1 hour will be dropped from user scores.   
 It is not guaranteed to have a wide spread of scores from 0 to 1, hence, we included an additional float column, user_score_percentile, that ranks the remote_addresses from 1 to 0, 1 being __most abnormal__, and 0 the __least abnormal__, such that the operator can decide to filter out users using percentile.
 
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/2-user-score.png" width="900" align="middle"/>  
+<img src="old_assets/images/2-user-score.png" width="900" align="middle"/>  
 
 Comparing Model Performance with Operator Actions  
 Currently, we understand that there are human monitoring and interventions by operators. Hence, one way to assess the performance of the model is to assess what is the user score for the manually flagged blacklisted addresses, and whether or not the algorithm ranks them >0.5, and also to check if the top ranked remote_addrs by the model is logical to the human operator. For post-mortem feedback, we suggest collecting the manually marked addresses (which can serve as labels) together with the training data and inference data and sending it over to the PI team as additional datasets to their approaches.  
@@ -114,12 +114,12 @@ Ways to improve model:
 Provide more training data to the model. (and should it not work, it would also help the PI team by giving them more training data to train their subsequent algorithms).    
 
 Pictorial Summary to Load Data into Model:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/27-load-data-to-vm-toffs.png" width="900" align="middle"/>  
+<img src="old_assets/images/27-load-data-to-vm-toffs.png" width="900" align="middle"/>  
 
 <a name="quick-start-pi"></a>
 # 1b. Quick Start (<span style="color:magenta">PI Team</span>)
 
-Scripts and modules pertaining to this section has also been tested on the following VM configuration: 
+Scripts and modules pertaining to this section has also been tested on the following VM configuration:
 + Azure NC6v2 with P100 GPU, Ubuntu 18.04.3 LTS (comes with 112GiB RAM)
 
 It assumes the following dependensices are installed within the VM:
@@ -128,11 +128,11 @@ It assumes the following dependensices are installed within the VM:
 + Nvidia-docker
 
 Refer to the [FAQ section](#faq) on installing these dependencies.
- 
+
 The repository can be located here [repository](https://bitbucket.ai3.aisingapore.org:9443/projects/TOFFTM/repos/threats-mitigation-base/browse)  
 
 Data and metadata to be given to the model can be located in the Toffs Azure blob storage container "transfer-to-pi"  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/3-azure-container.png" width="500" align="middle"/>
+<img src="old_assets/images/3-azure-container.png" width="500" align="middle"/>
 
 ### Setup
 ```bash
@@ -159,7 +159,7 @@ The parquet files should be used for experimentation:
            | - attack_timestamps.json
            | - GS_actual_label.csv
            | - 888.abcb11.com_actual_labels.csv
-</pre> 
+</pre>
 3. Modify `./config/model_config.yml` (config file):
   a. `evaluation:filename`
   b. `evaluation:training_period`
@@ -187,7 +187,7 @@ The following outputs are generated from a successful run:
 
 If model parameters are to be edited, please refer to the section [3. Configuration](#config).   
 Pictorial Summary to Load Data into Model:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/28-load-data-to-vm-pi.png" width="900" align="middle"/>  
+<img src="old_assets/images/28-load-data-to-vm-pi.png" width="900" align="middle"/>  
 <a name="overview"></a>
 # 2. Project Overview  
 
@@ -201,14 +201,14 @@ A deep neural network model that enables the classification of users as either m
 
 ### Data Available
 Overview of the datasets collected to date  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/4-dataset-overview.png" width="900" align="middle"/>  
+<img src="old_assets/images/4-dataset-overview.png" width="900" align="middle"/>  
 
 2 datasets are labeled. `GS_55555964.com_stage3.parquet` and `June_888.abcb11.com_stage3.parquet`
-These 2 datasets were among 3 datasets chosen, because according to psuedo ground truth, "GS" has more normal reqt than attack and the "Jun" dataset has overwhelmingly more attack requests than normal request. Thus we choose these 2 contrasting datasets to label manually. A 3th dataset CF13888.com which was a "balanced" dataset, was initially chosen but not labeled due to lack of time. 
+These 2 datasets were among 3 datasets chosen, because according to psuedo ground truth, "GS" has more normal reqt than attack and the "Jun" dataset has overwhelmingly more attack requests than normal request. Thus we choose these 2 contrasting datasets to label manually. A 3th dataset CF13888.com which was a "balanced" dataset, was initially chosen but not labeled due to lack of time.
 
-In the proposal, Web Application Firewall (WAF) logs were mentioned but Toffs mentioned that they do not normally activate WAF even during attacks, so there is no WAF logs to supplement the dataset. 
+In the proposal, Web Application Firewall (WAF) logs were mentioned but Toffs mentioned that they do not normally activate WAF even during attacks, so there is no WAF logs to supplement the dataset.
 
-For PI Team, it is recommended to use the parquet files because the raw csv files are very large and Pandas sometimes throws error ingesting the files. Databricks was used to ingest the raw files and subdomain specific parquet files are generated. A point to note is that the raw data rows have UTC timezones, but for the sake of simplicity in analysis and understanding, we shifted the timestamps to SGT (+8 UTC) when generating the parquets. This is because the client generated the data from 00:00hrs SGT  to 23:59:59hrs SGT when providing the dataset. 
+For PI Team, it is recommended to use the parquet files because the raw csv files are very large and Pandas sometimes throws error ingesting the files. Databricks was used to ingest the raw files and subdomain specific parquet files are generated. A point to note is that the raw data rows have UTC timezones, but for the sake of simplicity in analysis and understanding, we shifted the timestamps to SGT (+8 UTC) when generating the parquets. This is because the client generated the data from 00:00hrs SGT  to 23:59:59hrs SGT when providing the dataset.
 
 ### Labels
 To allow us to judge the performance of the models, labels are required for batch training and inference on historical data. At the start of the project, a pseudo ground truth method was used to label the users. Since we know the approximate period of attack (refer to `./data/metadata/attack_timestamps.json`), a rule was set that remote_addr outside of the attack periods are normal users;consequently, new users that are only seen during the attack are considered attackers.
@@ -250,26 +250,26 @@ Sparse categorical cross entropy is used to minimise memory consumption, because
 Each incoming request after 10 observations has a corresponding prediction, the difference between the actual and predicted forms the basis to categorise the request as a malicious or normal request.
 
 ### Aggregation to User Score  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/5-aggregation.png" width="600" align="middle"/>
+<img src="old_assets/images/5-aggregation.png" width="600" align="middle"/>
 
 The section above classifies requests as malicious or normal request, however, the objective is to classify users. For each `remote_addr`, normalize the request score (refer to `src/metrics.py`, `aggregate_user_traffic_metrics_prod`) and we take the product of the 1st predicted request to the *n*th predicted request.    
-    
+
 ### Deliverables
 High level overview of pipelines for evaluation (PI team) and deployment (PS team):
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/6-architecture-pic.png" width="900" align="middle"/>  
+<img src="old_assets/images/6-architecture-pic.png" width="900" align="middle"/>  
 
 The two pipelines are intended to be used together in the following manner:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/7-config-use.png" width="500" align="middle"/>
+<img src="old_assets/images/7-config-use.png" width="500" align="middle"/>
 
 <a name="config"></a>
 # 3. Configuration (`configuration.yml`)
 The screenshot below is an overview of the `configuration.yml` that allows user to tweak the model. Toffs team do not necessarily need to make changes to `configuration.yml`. However, for PI team, editing the configuration is highly likely a need.
 
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/8-configure-screenshot.png" width="700" align="middle"/>
+<img src="old_assets/images/8-configure-screenshot.png" width="700" align="middle"/>
 
 There are 3 sections (split into color sections) which governs the following:  
 1. Blue   : Parameters pertaining to the model itself.  
-2. Yellow : Where the data folder and outputs directories for the Toffs' MVP is to be found. 
+2. Yellow : Where the data folder and outputs directories for the Toffs' MVP is to be found.
 3. Green  : Where the data folder, output folders, labelling, plotting options are found.   
 
 Notes about `configuration.yml`:    
@@ -293,46 +293,46 @@ For instance "transformer: LabelTransformer" transformer is key, LabelTransforme
 
 Rows with a "-" are part of a Python List.   
 For instance 'timestamp' and 'remote_addr' are entries in a list, and the key to access the list is 'base'  
- 
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/9-configdata.png" width="1200" align="middle"/>  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/10-configmodel.png" width="1200" align="middle"/>
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/11-configeval.png" width="1200" align="middle"/>
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/12-configdeployment.png" width="1200" align="middle"/>
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/13-configplot.png" width="1200" align="middle"/>
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/14-configothers.png" width="1200" align="middle"/>
+
+<img src="old_assets/images/9-configdata.png" width="1200" align="middle"/>  
+<img src="old_assets/images/10-configmodel.png" width="1200" align="middle"/>
+<img src="old_assets/images/11-configeval.png" width="1200" align="middle"/>
+<img src="old_assets/images/12-configdeployment.png" width="1200" align="middle"/>
+<img src="old_assets/images/13-configplot.png" width="1200" align="middle"/>
+<img src="old_assets/images/14-configothers.png" width="1200" align="middle"/>
 
 ## Deployment User Guide
 Overview of the evaluation model.  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/15-walkthrough-pi.png" width="800" align="middle"/> 
+<img src="old_assets/images/15-walkthrough-pi.png" width="800" align="middle"/>
 Envisaged use case: to facilitate the PI team in recreating our reported results, as well as help to batch train/infer future datasets.  
 
 Overview of the toffs batch train/mini batch infer model.  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/16-walkthrough-toffs.png" width="800" align="middle"/>
+<img src="old_assets/images/16-walkthrough-toffs.png" width="800" align="middle"/>
 Envisaged use case: to train the model on a specified subdomain, and conduct inference on attack period data.
 
 ### Detailed view of deployment environment  
 The main processes, as well as inputs to and artefacts generated by the pipeline are shown in the following diagrams:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/17-vm-evaluation.png" width="800" align="middle"/>
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/18-vm-deployment.png" width="800" align="middle"/>  
+<img src="old_assets/images/17-vm-evaluation.png" width="800" align="middle"/>
+<img src="old_assets/images/18-vm-deployment.png" width="800" align="middle"/>  
 A closer look at the inference artefacts:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/19-artefacts-inference-1.png" width="800" align="middle"/>   
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/20-artefacts-inference-2.png" width="800" align="middle"/>
+<img src="old_assets/images/19-artefacts-inference-1.png" width="800" align="middle"/>   
+<img src="old_assets/images/20-artefacts-inference-2.png" width="800" align="middle"/>
 
 ### Code Documentation and Demo
 
 Overview of functions called in the evaluation, train and inference pipelines:  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/21-sequence-diagram.png" width="1500" align="middle"/>
+<img src="old_assets/images/21-sequence-diagram.png" width="1500" align="middle"/>
 
 For more details, refer to the diagrams generated by the `PyCallGraph` library here:  
 `src.evaluation.run_evaluation`
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/22-pycallgraph-evaluation.png" width="1500" align="middle"/>
+<img src="old_assets/images/22-pycallgraph-evaluation.png" width="1500" align="middle"/>
 `src.train.train`
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/23-pycallgraph-train.png" width="1500" align="middle"/>
+<img src="old_assets/images/23-pycallgraph-train.png" width="1500" align="middle"/>
 `src.inference.inference`
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/24-pycallgraph-inference.png" width="1500" align="middle"/>
+<img src="old_assets/images/24-pycallgraph-inference.png" width="1500" align="middle"/>
 
 Relationships between main classes used:
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/25-UML.png" width="900" align="middle"/>
+<img src="old_assets/images/25-UML.png" width="900" align="middle"/>
 
 #### LSTM_v2 model architecture
 The LSTM_v2 model uses the Keras functional API and instantiates model inputs and outputs based on 3 expected column types:
@@ -344,7 +344,7 @@ This is specified as a dictionary in the `col_types` argument of the function.
 
 The following diagram shows the way the inputs/outputs are structured for each of the 3 column types. This includes the dimensions of the initial input, whether or not it is followed by an embedding layer before concatenation, the activation function and loss function.
 
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/30-LSTM_v2-architecture.png" width="900" align="middle"/>
+<img src="old_assets/images/30-LSTM_v2-architecture.png" width="900" align="middle"/>
 
 For the categorical features, in order to generate inputs/outputs of the right dimensions, the argument `col_dims` specifying the dimensions of each column is required.
 
@@ -383,7 +383,7 @@ Install Docker:
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```  
-Lastly, 
+Lastly,
 ```bash
  sudo usermod -aG docker XXX
 ```  
@@ -405,7 +405,7 @@ Unless there is generated labels for the new dataset, there will be a need to ad
 2. Inside data/metadata folder, attack_timestamps.json. Add an entry to the json, in the format:  
   "filename.parquet" : [["start_time_of_attack"," end_time_of_attack"]],  
   For example:
-  "WN_mobile.beike188.com_stage3.parquet": [["2019-07-27 14:45:00", "2019-07-27 16:13:00"]] 
+  "WN_mobile.beike188.com_stage3.parquet": [["2019-07-27 14:45:00", "2019-07-27 16:13:00"]]
   For multiple attacks, refer to 1155jc.com entry in the attack_timestamps.
 
 ### Facing errors in trying to run bash scripts?
@@ -421,7 +421,7 @@ In vim editor, run the following command to see the line endings:
 :e ++ff=unix
 ```  
 if there are CRLF endings such as these:  (the "^M" at the end of each line)  
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/26-line-endings-debug.png" width="500" align="middle"/>
+<img src="old_assets/images/26-line-endings-debug.png" width="500" align="middle"/>
 run the following command (install with <sudo apt install dos2unix> if the VM does not have the utility)
 ```bash
 dos2unix pathto/script
@@ -438,7 +438,7 @@ There are 4 folders in this Blob Container:
 5. `notebooks` - due to size, we will be uploading the Jupyter notebooks into Azure blob instead.
 During the uploads, the staff would email us the affected domains and it is up to us to extract the relevant domain from the upload (because the uploads include other unaffected domains)
 For Jun dataset (AccessLog (June dataset), there was no email from client stating the attacked domains. Instead, they uploaded 2 `.zip` files (`Normal 16-06-2019.zip`, `attack_16-06-2019.zip`). From the attack.zip, we are able to infer that there are multiple domains attacked on 16th June, however, a plot of the traffic logs revealed that there were only 9 subdomains that were subject to volumetric attacks. These subdomains are prefixed with "Jun" inside `metadata/attack_timestamps.json`.
-As such, we chose those 9 domains as the subdomains for the June dataset. We identified the period of attack from `attack.zip` for these domains, BUT, extracted the data from `normal.zip` (This is because the staff said that there were overlaps in the rows in attack and normal). 
+As such, we chose those 9 domains as the subdomains for the June dataset. We identified the period of attack from `attack.zip` for these domains, BUT, extracted the data from `normal.zip` (This is because the staff said that there were overlaps in the rows in attack and normal).
 For Outwit dataset, there were no attack period given, but looking at the data, it was only a 2 hour period so we assumed that they only kept the attacked period. As such, we did not use this dataset at all.
 For Toucai, the timestamps are written in a `.txt` in the folder.
 
@@ -456,7 +456,7 @@ Currently the scope of the project does not involve detecting the event of a DDO
 - Exploring other data columns
 - Using the `count_per_user` and `unique_per_user` functions in `src.feature_eng`
   - These showed potential in terms of distinguishing attackers and normal users (refer to `eda_feature_eng.ipynb`). E.g. number of unique http_user_agents in past 5 min (the graph title indicates 1 min, which is a typo)
-  <img src="https://toffs.blob.core.windows.net/git-repo-assets/images/31-feature-eng-http-user-agent.png" width="300" align="middle"/>
+  <img src="old_assets/images/31-feature-eng-http-user-agent.png" width="300" align="middle"/>
   - But being numeric features, they have to be scaled properly (probably between 0 and 1) to be used in the model. Otherwise they will overwhelm the other features and also cause the training loss to explode.
 - Parsing string values in different ways (e.g. simplifying http_user_agent)
 - Hyperparameter tuning
@@ -471,8 +471,4 @@ More clarification on the workflow of applying captchas to suspected malicious u
 
 ### Integration Challenges  
 Based on our discussion with Toffs on 18th Dec, due to latency between Nginx and the logging servers, some of the Nginx nodes might pass on their request logs late to the DB (potentially to 1 hr late). Different Nginx might serve the same user due to load balancing. Hence during inference, it is possible that requests from even the same user could arrive out of order in different csv batches to the model.   
-<img src="https://toffs.blob.core.windows.net/git-repo-assets/images/29-toffs-architecture-discussion.png" width="900" align="middle"/>  
-
-
-
-
+<img src="old_assets/images/29-toffs-architecture-discussion.png" width="900" align="middle"/>  
