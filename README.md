@@ -169,7 +169,7 @@ Due to size, the data repository can be found in the Azure Toffs blob container 
 
 The parquet files should be used for experimentation:
 1. To run an experiment, put a parquet file inside the `./data/evaluation` folder of the VM and specify the relevant filename in `configuration.yml`
-2. Download `/metadata` folder from Azure blob and put it in the `threats-mitigation-base` root folderas such:
+2. Download `/metadata` folder from Azure blob and put it in the `threats-mitigation-base` root folder as such:
 <pre>
  |- threats-mitigation-base
     | - data
@@ -280,36 +280,36 @@ The two pipelines are intended to be used together in the following manner:
 <img src="assets/images/7-config-use.png" width="500" align="middle"/>
 
 <a name="config"></a>
-# 3. Configuration (`configuration.yml`)
-The screenshot below is an overview of the `configuration.yml` that allows user to tweak the model. Toffs team do not necessarily need to make changes to `configuration.yml`. However, for PI team, editing the configuration is highly likely a need.
+# 3. Configuration (`config.yaml`)
+The screenshot below is an overview of the `config.yaml` that allows user to tweak the model. Toffs team do not necessarily need to make changes to `config.yaml`. However, for PI team, editing the configuration is highly likely a need.
 
 <img src="assets/images/8-configure-screenshot.png" width="700" align="middle"/>
 
-There are 3 sections (split into color sections) which governs the following:  
+<!-- There are 3 sections (split into color sections) which governs the following:  
 1. Blue   : Parameters pertaining to the model itself.  
 2. Yellow : Where the data folder and outputs directories for the Toffs' MVP is to be found.
-3. Green  : Where the data folder, output folders, labelling, plotting options are found.   
+3. Green  : Where the data folder, output folders, labelling, plotting options are found.    -->
 
-Notes about `configuration.yml`:    
+Notes about `config.yaml`:    
 Lines starting with # is a comment. There are no block comments symbols.  
 The configuration file is read by functions in `src.evaluation.py`, `src.train.py`, `src.inference.py` as a Python nested dictionary (with some lists inside). Thus be careful with the use of spacing.
-There are 6 sections in this configuration file, i.e. keys in dictionary:  
+<!-- There are 6 sections in this configuration file, i.e. keys in dictionary:  
 1. data
 2. model
 3. deployment_path
 4. evaluation
 5. plotting
-6. others
+6. others -->
 
 Rows with colons (`:`) are keys in a dictionary.   
-For instance "transformer: LabelTransformer" transformer is key, LabelTransformer is value.
+For instance "agentHashRange: 50" agentHashRange is key, 50 is value.
 
 <pre>key:  
   subkey:   
     sub_subkey: value  
 </pre>
 
-Rows with a "-" are part of a Python List.   
+<!-- Rows with a "-" are part of a Python List.   
 For instance 'timestamp' and 'remote_addr' are entries in a list, and the key to access the list is 'base'  
 
 <img src="assets/images/9-configdata.png" width="1200" align="middle"/>  
@@ -317,7 +317,7 @@ For instance 'timestamp' and 'remote_addr' are entries in a list, and the key to
 <img src="assets/images/11-configeval.png" width="1200" align="middle"/>
 <img src="assets/images/12-configdeployment.png" width="1200" align="middle"/>
 <img src="assets/images/13-configplot.png" width="1200" align="middle"/>
-<img src="assets/images/14-configothers.png" width="1200" align="middle"/>
+<img src="assets/images/14-configothers.png" width="1200" align="middle"/> -->
 
 ## Deployment User Guide
 Overview of the evaluation model.  
