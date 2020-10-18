@@ -409,7 +409,7 @@ def calculateSequenceScores(modelP, tokenizer_normal, df_normal, df_attack, maxl
     df_temp['logLSTM'] = df_temp.apply(lambda x: calcLogLstm(x["Histo"], x["Agent"], x["Country"], CountryAgentHistogram_Normal, CountryHistogram_Normal, AgentHistogram_Normal, norm_size, maxlen, x['Pint'], x['Py']),axis=1)
 
     # changed
-    print("Histogram with mean",CountryAgentHistogram_Normal.mean(),"and variance",CountryAgentHistogram_Normal.mean())
+    print("Histogram with mean",CountryAgentHistogram_Normal.mean()/norm_size,"and standard deviation",CountryAgentHistogram_Normal.mean()/norm_size)
     df_temp['multiplier'] = df_temp.apply(lambda x: getMultiplier(IP_Histogram_Attack, CountryAgentHistogram_Normal.mean(), CountryAgentHistogram_Normal.std(), x["IP"], atk_size, T, W),axis=1)
 
 
@@ -426,7 +426,7 @@ def calculateSequenceScores(modelP, tokenizer_normal, df_normal, df_attack, maxl
     df_min_max = pd.DataFrame(x_scaled)
     df_temp['P'] = df_min_max
 
-    df_temp['P'] = df_temp.apply(lambda x: x['P'] * x['multiplier'])
+    df_temp['P'] = df_temp['P'] * df_temp['multiplier']
 
 
 

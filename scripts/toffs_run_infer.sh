@@ -1,4 +1,4 @@
-if [[ "$(pwd)" == *threats-mitigation-base-v21 ]]
+if [[ "$(pwd)" == *threats-mitigation-base ]]
 then
 	if [ -z "$1" ]
 	then

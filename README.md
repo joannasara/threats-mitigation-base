@@ -30,6 +30,8 @@ Refer to the [FAQ section](#faq) on installing these dependencies.
 
 ### Setup
 Git clone the [repository](https://bitbucket.ai3.aisingapore.org:9443/projects/TOFFTM/repos/threats-mitigation-base/browse) to the Linux machine that the experimentation would be conducted on.
+Please rename the root folder to threats-mitigation-base if it is named otherwise upon cloning.
+
 ```bash
 git clone <repo>
 cd scripts
