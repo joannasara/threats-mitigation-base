@@ -353,19 +353,16 @@ def getHistogramProbability(histogram, value, datasize):
     else :
         return histogram[value]/datasize
 
-def getMultiplier(histogram, value, datasize, T, W):
-    return 1
-    # hist_prob = getHistogramProbability(histogram, value, datasize)
-    # if hist_prob > T:
-    #     return W
-    # elif hist_prob > T/2:
-    #     return W*2
-    # elif hist_prob > T/5:
-    #     return W*5
-    # elif hist_prob > T/10:
-    #     return W*8
-    # else:
-    #     return 1
+def getMultiplier(histogram, mean, std, value, datasize, T, W):
+    percentage = histogram[value]/datasize
+
+    if percentage < mean:
+        return 1
+    elif percentage < mean + std:
+        return 5
+    else:
+        return 10
+
 
 # This ensures that there is at least some probability
 def getHistogramSmoothedProbability(histogram, value, datasize, minimumNum):
@@ -382,6 +379,9 @@ def calculateSequenceScores(modelP, tokenizer_normal, df_normal, df_attack, maxl
 
     norm_size = len(df_normal)
     atk_size = len(df_attack)
+
+    IP_Histogram_Normal = df_normal['IP'].value_counts()
+    IP_Histogram_Attack = df_attack['IP'].value_counts()
 
     CountryAgentHistogram_Normal = df_normal['Histo'].value_counts()
     CountryAgentHistogram_Attack = df_attack['Histo'].value_counts()
@@ -408,10 +408,27 @@ def calculateSequenceScores(modelP, tokenizer_normal, df_normal, df_attack, maxl
 
     df_temp['logLSTM'] = df_temp.apply(lambda x: calcLogLstm(x["Histo"], x["Agent"], x["Country"], CountryAgentHistogram_Normal, CountryHistogram_Normal, AgentHistogram_Normal, norm_size, maxlen, x['Pint'], x['Py']),axis=1)
 
-    df_temp['multiplier'] = df_temp.apply(lambda x: getMultiplier(CountryAgentHistogram_Attack, x["Histo"], atk_size, T, W),axis=1)
+    # changed
+    print("Histogram with mean",CountryAgentHistogram_Normal.mean(),"and variance",CountryAgentHistogram_Normal.mean())
+    df_temp['multiplier'] = df_temp.apply(lambda x: getMultiplier(IP_Histogram_Attack, CountryAgentHistogram_Normal.mean(), CountryAgentHistogram_Normal.std(), x["IP"], atk_size, T, W),axis=1)
 
 
-    df_temp['P'] = df_temp.apply(lambda x: calcProbability(x["Histo"], x["Agent"], x["Country"], CountryAgentHistogram_Normal, CountryHistogram_Normal, AgentHistogram_Normal, norm_size, maxlen, x['Pint'], x['Py']) * x['multiplier'],axis=1)
+    # old
+    # df_temp['P'] = df_temp.apply(lambda x: calcProbability(x["Histo"], x["Agent"], x["Country"], CountryAgentHistogram_Normal, CountryHistogram_Normal, AgentHistogram_Normal, norm_size, maxlen, x['Pint'], x['Py']) * x['multiplier'],axis=1)
+
+    # changed
+    df_temp['P'] = df_temp.apply(lambda x: calcProbability(x["Histo"], x["Agent"], x["Country"], CountryAgentHistogram_Normal, CountryHistogram_Normal, AgentHistogram_Normal, norm_size, maxlen, x['Pint'], x['Py']), axis=1)
+
+    df_min_max = deepcopy(df_temp[['P']])
+    x = df_min_max.values #returns a numpy array
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(x)
+    df_min_max = pd.DataFrame(x_scaled)
+    df_temp['P'] = df_min_max
+
+    df_temp['P'] = df_temp.apply(lambda x: x['P'] * x['multiplier'])
+
+
 
     print('c3')
     df_temp = df_temp.groupby(['IP'])
@@ -482,12 +499,12 @@ def main():
     sr = calculateSequenceScores(modelP, tokenizer_normal, df_normal, df_attack, config['SEQUENCELENGTH'], config['T'], config['W'], config)
     sr_P = sr[['IP', 'P']].copy()
 
-    df_min_max = deepcopy(sr_P[['P']])
-    x = df_min_max.values #returns a numpy array
-    min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = min_max_scaler.fit_transform(x)
-    df_min_max = pd.DataFrame(x_scaled)
-    sr_P['P'] = df_min_max
+    # df_min_max = deepcopy(sr_P[['P']])
+    # x = df_min_max.values #returns a numpy array
+    # min_max_scaler = preprocessing.MinMaxScaler()
+    # x_scaled = min_max_scaler.fit_transform(x)
+    # df_min_max = pd.DataFrame(x_scaled)
+    # sr_P['P'] = df_min_max
     sr_P = sr_P.sort_values(by = ['P'])
 
     print(time.time() - start)

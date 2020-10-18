@@ -1,4 +1,4 @@
-if [[ "$(pwd)" == *threats-mitigation-base-v20 ]]
+if [[ "$(pwd)" == *threats-mitigation-base-v21 ]]
 then
 docker run --gpus all \
 	-v /$(pwd):/usr/toffs_train \
