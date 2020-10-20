@@ -356,12 +356,16 @@ def getHistogramProbability(histogram, value, datasize):
 def getMultiplier(histogram, mean, std, value, datasize, T, W):
     percentage = histogram[value]/datasize
 
-    if percentage < mean:
+    if percentage <=  mean:
         return 1
-    elif percentage < mean + std:
-        return 5
+    elif percentage <=  mean + std:
+        return 0.8
+    elif percentage <=  mean + 2*std:
+        return 0.6
+    elif percentage <= mean + 3*std:
+        return 0.4
     else:
-        return 10
+        return 0.1
 
 
 # This ensures that there is at least some probability
